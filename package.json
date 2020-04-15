@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/alvaroluna/Node.js-MySQL/issues"
   },
-  "homepage": "https://github.com/alvaroluna/Node.js-MySQL#readme"
+  "homepage": "https://github.com/alvaroluna/Node.js-MySQL#readme",
+  "dependencies": {
+    "mysql": "^2.18.1"
+  }
 }
