@@ -19,6 +19,4 @@ Bamazon is an Amazon-like storefront which utilizes MySQL and node.js. The app w
 * The app will require npm inquirer and npm mysql.
 
 * **Video Demo**
-* Below is a recording of the app running in the console. First half removes an item from inventory and reports the results. The second half of the video shows what happens when too much of an item is selected for purchase.
-
 ![videoDemo](https://drive.google.com/file/d/1LvEIevLL8uJhj_WnAhwp9k5cJ33eE0KT/view)
