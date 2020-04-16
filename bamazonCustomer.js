@@ -1,53 +1,100 @@
 var mysql = require("mysql");
+var table = require("console.table");
+var inquirer = require("inquirer");
 
-UPDATE Customers
-SET ContactName = 'Alfred Schmidt', City= 'Frankfurt'
-WHERE CustomerID = 1;
-
-//////////////////////
-// HELPER FUNCTIONS //
-//////////////////////
-function querySongsInRange() {
-    var query = connection.query(
-      "SELECT * FROM top5000 WHERE year BETWEEN 1979 AND 1980",
-      function (err, res) {
-        if (err) throw err;
-        for (var i = 0; i < res.length; i++) {
-          // console.log(res[i]);
-          console.table(res);
-        }
-        console.log("-----------------------------------");
-      }
-    );
-    console.log(query.sql);
-    connection.end();
-  }
-
-//////////
-// MAIN //
-//////////
 var connection = mysql.createConnection({
   host: "localhost",
-
-  // Your port; if not 3306
   port: 3306,
 
-  // Your username
   user: "root",
 
-  // Your password
   password: "Cinnamon1",
   database: "bamazon",
 });
 
-connection.connect(function (err) {
-  if (err) throw err;
-  console.log("connected as id " + connection.threadId);
+function productId() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "id",
+        message:
+          "Please enter the Item ID of the product you would like to buy.\n",
+        validate: function (value) {
+          if (!isNaN(value) && value < 11) {
+            return true;
+          }
+          return false;
+        },
+      },
 
-  // run these functions
-  //   querySpecificArtists();
-  //   queryArtistsThatAppearMoreThanOnce();
-  //   querySongsInRange();
-  //   querySong();
-  console.log("This is working");
-});
+      {
+        type: "input",
+        name: "qty",
+        message: "How many units of the product would you like to buy? \n",
+        validate: function (value) {
+          if (!isNaN(value)) {
+            return true;
+          }
+          return false;
+        },
+      },
+    ])
+    .then(function (answer) {
+      var userId = answer.id;
+      console.log("Chosen item id: ", userId);
+
+      var userQuant = answer.qty;
+      console.log("Chosen quantity from stock: ", userQuant, "\n");
+
+      connection.query(
+        "SELECT * FROM products WHERE ?",
+        [{ item_id: answer.id }],
+        function (err, res) {
+          if (err) throw err;
+
+          console.table(res);
+          var current_quantity = res[0].stock_quantity;
+          console.log("Current quantity in stock: ", current_quantity);
+          var price = res[0].price;
+          var remaining_quantity = current_quantity - answer.qty;
+          console.log("Remaining quantity in stock: ", remaining_quantity);
+
+          if (current_quantity > answer.qty) {
+            console.log("Amount Remaining: " + remaining_quantity);
+            console.log("Total Cost: " + answer.qty * price + "\n");
+
+            connection.query(
+              "UPDATE products SET stock_quantity=? WHERE item_id=?",
+              [remaining_quantity, answer.id],
+
+              function (err, res) {
+                console.table(res);
+              }
+            );
+
+            connection.query("SELECT * FROM products", function (err, res) {
+              console.log("This is the updated inventory of product items: ");
+              console.log("------------------------------- \n");
+              console.table(res);
+            });
+          } else {
+            console.log("Insufficient amounts, please edit your units!");
+          }
+
+          connection.end();
+        }
+      );
+    });
+}
+
+function productItems() {
+  connection.connect(function (err) {
+    connection.query("SELECT * FROM products", function (err, res) {
+      if (err) throw err;
+      else console.table(res, "\n");
+      productId();
+    });
+  });
+}
+productItems();
