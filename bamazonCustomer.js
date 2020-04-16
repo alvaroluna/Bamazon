@@ -12,14 +12,14 @@ var connection = mysql.createConnection({
   database: "bamazon",
 });
 
-function productId() {
+function ProductInventoryLogic() {
   inquirer
     .prompt([
       {
         type: "input",
         name: "id",
         message:
-          "Please enter the Item ID of the product you would like to buy.\n",
+          "Please enter the 'item_id' of the product you would like to buy.\n",
         validate: function (value) {
           if (!isNaN(value) && value < 11) {
             return true;
@@ -54,9 +54,12 @@ function productId() {
           if (err) throw err;
 
           console.table(res);
+
           var current_quantity = res[0].stock_quantity;
           console.log("Current quantity in stock: ", current_quantity);
+
           var price = res[0].price;
+
           var remaining_quantity = current_quantity - answer.qty;
           console.log("Remaining quantity in stock: ", remaining_quantity);
 
@@ -88,13 +91,17 @@ function productId() {
     });
 }
 
-function productItems() {
+/////////////////
+// MAIN METHOD //
+/////////////////
+function Main() {
   connection.connect(function (err) {
     connection.query("SELECT * FROM products", function (err, res) {
       if (err) throw err;
       else console.table(res, "\n");
-      productId();
+      Main();
     });
   });
 }
-productItems();
+
+Main();
