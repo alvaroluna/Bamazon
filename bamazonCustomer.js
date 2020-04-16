@@ -14,12 +14,10 @@ var connection = mysql.createConnection({
 
 function ProductInventoryLogic() {
   inquirer
-    .prompt([
-      {
+    .prompt([{
         type: "input",
         name: "id",
-        message:
-          "Please enter the 'item_id' of the product you would like to buy.\n",
+        message: "Please enter the 'item_id' of the product you would like to buy.\n",
         validate: function (value) {
           if (!isNaN(value) && value < 11) {
             return true;
@@ -49,7 +47,9 @@ function ProductInventoryLogic() {
 
       connection.query(
         "SELECT * FROM products WHERE ?",
-        [{ item_id: answer.id }],
+        [{
+          item_id: answer.id
+        }],
         function (err, res) {
           if (err) throw err;
 
@@ -99,9 +99,9 @@ function Main() {
     connection.query("SELECT * FROM products", function (err, res) {
       if (err) throw err;
       else console.table(res, "\n");
-      Main();
+      ProductInventoryLogic();
     });
   });
 }
 
-Main();
+Main()
